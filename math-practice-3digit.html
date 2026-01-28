@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 數學練習 - 三位數加減</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        
+        h1 {
+            color: #764ba2;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .question-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            font-size: 2.5em;
+            font-weight: bold;
+            letter-spacing: 5px;
+        }
+        
+        .question-box .operator {
+            font-size: 1.5em;
+            margin: 0 10px;
+        }
+        
+        .answer-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 2em;
+            border: 4px solid #667eea;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+            letter-spacing: 3px;
+        }
+        
+        .answer-input:focus {
+            outline: none;
+            border-color: #764ba2;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn {
+            padding: 15px 50px;
+            font-size: 1.3em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #666;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+        
+        .feedback {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.3em;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        
+        .feedback.wrong {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        
+        .streak {
+            background: #ffd700;
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .mode-selector {
+            margin-bottom: 20px;
+        }
+        
+        .mode-btn {
+            padding: 10px 25px;
+            margin: 5px;
+            border: 3px solid #667eea;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .mode-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+        
+        .timer {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .correct-anim {
+            animation: bounce 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 數學練習</h1>
+        <p class="subtitle">三位數加減法</p>
+        
+        <div class="streak" id="streak">🔥 連續正確: 0</div>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="correct">0</div>
+                <div class="stat-label">正確</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="wrong">0</div>
+                <div class="stat-label">錯誤</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="total">0</div>
+                <div class="stat-label">總數</div>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        
+        <div class="timer" id="timer">問題 1/10</div>
+        
+        <div class="mode-selector">
+            <button class="mode-btn active" onclick="setMode('add')">加法 +</button>
+            <button class="mode-btn" onclick="setMode('sub')">減法 -</button>
+            <button class="mode-btn" onclick="setMode('mixed')">混合 🔀</button>
+        </div>
+        
+        <div class="question-box" id="question">
+            123 + 456 =="setMode(' ?
+        </div>
+        
+        <input type="number" class="answer-input" id="answer" placeholder="答案" autofocus>
+        
+        <br>
+        
+        <button class="btn btn-primary" onclick="checkAnswer()">✅ 確定</button>
+        <button class="btn btn-secondary" onclick="nextQuestion()">下一題 ➡️</button>
+        
+        <div class="feedback" id="feedback"></div>
+    </div>
+    
+    <script>
+        let currentMode = 'add';
+        let currentAnswer = 0;
+        let correct = 0;
+        let wrong = 0;
+        let streak = 0;
+        let questionNum = 1;
+        let totalQuestions = 10;
+        let correctStreak = 0;
+        
+        // Load from localStorage
+        let stats = JSON.parse(localStorage.getItem('math3digitStats') || '{"correct": 0, "wrong": 0, "streak": 0}');
+        correct = stats.correct;
+        wrong = stats.wrong;
+        streak = stats.streak;
+        
+        updateDisplay();
+        generateQuestion();
+        
+        function setMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            resetSession();
+        }
+        
+        function generateQuestion() {
+            const num1 = Math.floor(Math.random() * 900) + 100; // 100-999
+            const num2 = Math.floor(Math.random() * 900) + 100; // 100-999
+            
+            let operator;
+            if (currentMode === 'mixed') {
+                operator = Math.random() > 0.5 ? '+' : '-';
+            } else {
+                operator = currentMode === 'add' ? '+' : '-';
+            }
+            
+            if (operator === '+') {
+                currentAnswer = num1 + num2;
+            } else {
+                // Ensure positive result for subtraction
+                if (num1 >= num2) {
+                    currentAnswer = num1 - num2;
+                } else {
+                    currentAnswer = num2 - num1;
+                    [num1, num2] = [num2, num1];
+                }
+            }
+            
+            document.getElementById('question').innerHTML = `
+                ${num1} <span class="operator">${operator}</span> ${num2} = ?
+            `;
+        }
+        
+        function checkAnswer() {
+            const userAnswer = parseInt(document.getElementById('answer').value);
+            const feedback = document.getElementById('feedback');
+            
+            if (isNaN(userAnswer)) {
+                feedback.textContent = '請輸入數字！';
+                feedback.className = 'feedback wrong';
+                return;
+            }
+            
+            if (userAnswer === currentAnswer) {
+                correct++;
+                correctStreak++;
+                if (correctStreak > streak) {
+                    streak = correctStreak;
+                }
+                feedback.textContent = '✅ 正確！叻叻！';
+                feedback.className = 'feedback correct';
+                document.getElementById('question').classList.add('correct-anim');
+                setTimeout(() => document.getElementById('question').classList.remove('correct-anim'), 500);
+            } else {
+                wrong++;
+                correctStreak = 0;
+                feedback.textContent = `❌ 錯咗！正確答案是 ${currentAnswer}`;
+                feedback.className = 'feedback wrong';
+            }
+            
+            // Save to localStorage
+            stats = { correct, wrong, streak };
+            localStorage.setItem('math3digitStats', JSON.stringify(stats));
+            
+            updateDisplay();
+            
+            // Auto next after delay
+            setTimeout(() => {
+                if (questionNum < totalQuestions) {
+                    nextQuestion();
+                } else {
+                    showFinalResult();
+                }
+            }, 1500);
+        }
+        
+        function nextQuestion() {
+            questionNum++;
+            document.getElementById('answer').value = '';
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('answer').focus();
+            updateDisplay();
+            generateQuestion();
+        }
+        
+        function resetSession() {
+            questionNum = 1;
+            updateDisplay();
+            document.getElementById('answer').value = '';
+            document.getElementById('feedback').style.display = 'none';
+            generateQuestion();
+        }
+        
+        function updateDisplay() {
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('wrong').textContent = wrong;
+            document.getElementById('total').textContent = correct + wrong;
+            document.getElementById('streak').textContent = `🔥 連續正確: ${streak}`;
+            document.getElementById('timer').textContent = `問題 ${questionNum}/${totalQuestions}`;
+            document.getElementById('progressFill').style.width = `${((questionNum-1)/totalQuestions)*100}%`;
+        }
+        
+        function showFinalResult() {
+            const percentage = Math.round((correct / (correct + wrong)) * 100);
+            let message;
+            
+            if (percentage >= 90) {
+                message = '🌟 太勁啦！數學天才！';
+            } else if (percentage >= 70) {
+                message = '💪 做得好！繼續努力！';
+            } else if (percentage >= 50) {
+                message = '📚 有進步空間，多啲練習！';
+            } else {
+                message = '💪 唔緊要，慢慢嚟！';
+            }
+            
+            document.getElementById('question').innerHTML = `
+                🎉 完成曬！
+                <br><br>
+                正確: ${correct} | 錯誤: ${wrong}
+                <br><br>
+                ${message}
+            `;
+            document.getElementById('answer').style.display = 'none';
+            document.querySelector('.btn-primary').style.display = 'none';
+            document.querySelector('.btn-secondary').textContent = '🔄 再玩一次';
+            document.querySelector('.btn-secondary').onclick = () => location.reload();
+        }
+        
+        // Enter key to submit
+        document.getElementById('answer').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+    </script>
+</body>
+</html>
